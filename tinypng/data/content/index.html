@@ -1,0 +1,108 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8" />  
+    <title>HTML5 File API</title> 
+	<style>
+		body {  
+			font: 14px/1.5 helvetica-neue, helvetica, arial, san-serif;  
+			padding:10px;  
+		}  
+		  
+		h1 {  
+			margin-top:0;  
+		}  
+		  
+		#main {  
+			width: 300px;  
+			margin:auto;  
+			background: #ececec;  
+			padding: 20px;  
+			border: 1px solid #ccc;  
+		}  
+		  
+		#image-list {  
+			list-style:none;  
+			margin:0;  
+			padding:0;  
+		}  
+		#image-list li {  
+			background: #fff;  
+			border: 1px solid #ccc;  
+			text-align:center;  
+			padding:20px;  
+			margin-bottom:19px;  
+		}  
+		#image-list li img {  
+			width: 258px;  
+			vertical-align: middle;  
+			border:1px solid #474747;  
+		} 
+	</style>
+</head>  
+<body>  
+    <div id="main">  
+        <h1>Upload Your Images</h1>  
+        <form method="post" enctype="multipart/form-data"  action="upload.php">  
+            <input type="file" name="image" id="image" />  
+            <button type="submit" id="btn">Upload Files!</button>  
+        </form>  
+  
+        <div id="response"></div>  
+        <ul id="image-list">  
+  
+        </ul>  
+    </div>  
+  
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>  
+	<script>
+		var input = document.getElementById("image"),formdata = new FormData();  
+		
+		function showUploadedItem (source) {  
+			var list = document.getElementById("image-list"),  
+				li   = document.createElement("li"),  
+				img  = document.createElement("img");  
+			img.src = source;  
+			li.appendChild(img);  
+			list.appendChild(li);  
+		}   
+		
+		input.addEventListener("change", function (evt) {  
+			var i = 0, len = this.files.length, img, reader, file;  
+			  
+			document.getElementById("response").innerHTML = "Uploading . . ."  
+			file = this.files[0];
+			formdata.append("image", file);  
+			
+			var req = new XMLHttpRequest();
+			req.open('POST', 'http://tinypng.org/api/shrink'); 
+			req.onreadystatechange = function (aEvt) {
+			  if (req.readyState == 4) {
+				 if(req.status == 200) {
+				  //console.log(req);
+				  var response = JSON.parse(req.response);
+				  console.log(response);
+				  document.getElementById("response").innerHTML = "<img src='" + response.output.url + "'>";
+				 } else {
+				  console.log("Erreur pendant le chargement de la page.\n");
+				 }
+			  }
+			};
+			req.send(file);
+			  
+			
+			 /*
+			$.ajax({  
+				url: "http://tinypng.org/api/shrink",  
+				type: "POST",  
+				data: formdata,  
+				processData: false,  
+				contentType: false,  
+				success: function (res) { 
+					console.log(res);				
+				}  
+			});*/ 
+		}, false); 
+	</script>  
+</body>  
+</html>
